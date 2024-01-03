@@ -1,0 +1,8 @@
+{
+	"test_name":"Pruebas de Calidad reporte Saldos Diarios",
+	"test_owner":"DIECEBAL@bancolombia.com.co",
+	"mail_users" : [
+		"GIMORENO@bancolombia.com.co",
+		"DIECEBAL@bancolombia.com.co"
+	]
+}

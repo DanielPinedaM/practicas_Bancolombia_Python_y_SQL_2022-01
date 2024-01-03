@@ -1,0 +1,112 @@
+with t1 as (
+Select
+cast(t1.num_doc_territorio as bigint) as id,
+(case when t1.libro<>1 and cast(t1.cod_moneda as bigint) = 1 then t1.exposicion_tot_fa * t1.trm_cierre
+else t1.exposicion_tot_fa
+end) as exposicion_tot_fa,
+(case when t1.libro<>1 and cast(t1.cod_moneda as bigint) = 1 then t1.sld_ca * t1.trm_cierre
+else t1.sld_ca
+end) as sld_cap_tot,
+(case when t1.libro<>1 and cast(t1.cod_moneda as bigint) = 1 then t1.sld_tot_provision * t1.trm_cierre
+else t1.sld_tot_provision
+end) as sld_tot_provision,
+(case when t1.libro<>1 and cast(t1.cod_moneda as bigint) = 1 then t1.c90 * t1.trm_cierre
+else t1.c90
+end) as cv,
+(CASE WHEN cast(datediff(t1.f_venc,t1.f_desemb)/30 as int)<=12 THEN '0-12'
+WHEN cast(datediff(t1.f_venc,t1.f_desemb)/30 as int) between 13 and 36 THEN '13-36'
+WHEN cast(datediff(t1.f_venc,t1.f_desemb)/30 as int) between 37 and 60 THEN '37-60'
+WHEN cast(datediff(t1.f_venc,t1.f_desemb)/30 as int)>60 THEN' mayor a 60'
+ELSE 'sin plazo'
+END) AS Rango_plazo,
+t1.ingestion_month,
+t1.ingestion_year
+FROM resultados_riesgos.master_credit_risk as t1
+where libro = 1 and (t1.ingestion_year*100+t1.ingestion_month)>=201912
+
+
+
+),
+
+
+
+t2 as(
+select
+t1.id,
+t2.nombre_cli,
+t2.nombre_gte,
+cast(t2.cal_interna as string) as calif_int,
+(case
+when t2.segm in (
+'GOBIERNO',
+'INSTITUCIONES FINANCIERAS',
+'CORPORATIVA',
+'CONSTRUCTOR EMPRESARIAL',
+'CONSTRUCTOR PYME',
+'CONSTRUCTOR CORPORATIVO',
+'INTERNACIONAL'
+) then 'CORPORATIVO'
+when t2.segm in (
+'PERSONAL',
+'PREFERENCIAL',
+'PLUS',
+'SOCIAL'
+) then 'PERSONAS'
+when t2.segm in (
+'PYMES',
+'GOBIERNO DE RED'
+) then 'PYMES'
+else t2.segm
+end) as segm,
+(case when CIIU_EXCEPCION is not null then CIIU_EXCEPCION else cod_ciiu end) as cod_ciiu,
+t1.ingestion_month,
+t1.ingestion_year,
+sum(exposicion_tot_fa) as expo,
+sum(sld_cap_tot) as capital,
+sum(sld_tot_provision) as provision,
+sum(cv) as cv
+from t1
+inner join resultados_vspc_clientes.master_customer_data t2 on t1.id=cast(t2.num_doc as bigint)
+left join (select * from resultados_riesgos.sectorial_excepciones_ciiu where ingestion_year*10000+ingestion_month*100+ ingestion_day= (select max(ingestion_year*10000+ingestion_month*100+ ingestion_day) from resultados_riesgos.sectorial_excepciones_ciiu)) te on te.nit=t1.id
+WHERE t2.year = year(date_sub(now(),2))
+and t2.month =month(date_sub(now(),2))
+and t2.ingestion_day = day(date_sub(now(),2))
+group by 1,2,3,4,5,6,7,8
+),
+
+
+
+t3 as (
+select
+cast(num_doc as bigint) as num_doc,
+ingestion_month,
+ingestion_year,
+max(bucket) as bucket
+from resultados_ifrs9.gasto_ifrs9 as t1
+where (t1.ingestion_year*100+t1.ingestion_month)>=201912
+group by 1,2,3
+)
+
+
+
+select
+id,
+nombre_cli,
+subsector_trabajado,
+segm,
+bucket,
+t2.ingestion_month,
+t2.ingestion_year,
+sum(expo) as expo,
+sum(capital) as capital,
+sum(provision) as provision,
+sum(cv) as cv,
+count( distinct t2.id)
+from t2
+left join (select * from resultados_riesgos.master_riesgo_sectorial where ingestion_year*100+ ingestion_month = (select max(ingestion_year*100+ ingestion_month) from resultados_riesgos.master_riesgo_sectorial)) t4 on t2.cod_ciiu=t4.cod_ciiu
+left join t3 on (t3.num_doc = t2.id and t3.ingestion_month=t2.ingestion_month and t3.ingestion_year=t2.ingestion_year)
+where subsector_trabajado in ('INMOBILIARIO APETITO')
+
+
+
+group by 1,2,3,4,5,6,7

@@ -1,0 +1,46 @@
+# agregar string a un string existente
+# el objetivo de este pseudo-codigo es pasarlo a Python 
+# para concatenar (unir) varias consultas SELECT ... FROM ... WHERE ... UNION ...
+
+# cuantos menos peticiones al servidor mejor
+
+consulta_2=""
+consulta_2_definitiva = ""
+
+Para i=1 hasta N insumos # recorrer Excel de insumos
+     # leer (guardar) columna fecha_desembolso
+
+     Para i=1 hasta N Filas # recorrer filas de DataFrame
+          # Recorrer columna fecha desembolso
+          year_consulta_2              = ...
+          ingestion_month_consulta_2   = ...
+
+          # Recorrer columna numero_obligacion
+          numero_obligacion_consulta_2 = lista[i]
+
+          consulta_2="""
+          SELECT /*CAST(id AS BIGINT) AS numero_identificacion,*/
+                 CAST(obl341 AS BIGINT) AS numero_obligacion,
+                 calife AS calificacion_al_momento_del_desembolso
+          FROM resultados_riesgos.ceniegarc_lz
+          WHERE (CAST(year AS BIGINT)={})
+                AND (CAST(ingestion_month AS BIGINT)={})
+                AND (FROM_TIMESTAMP(fdesem,'yyyyMM') = CAST(corte AS STRING))
+                AND (CAST(obl341 AS BIGINT))
+                IN (/*aqui va el numero_obligacion*/{})
+          UNION
+          """.format(year_consulta_2,
+                     ingestion_month_consulta_2
+                     numero_obligacion_consulta_2
+                     )
+
+          # concatenar (unir) un string
+          # cuando todo esto se termine de concatenar entonces tendre la consulta con todas las fechas q cambian
+          consulta_2_definitiva = consulta_2_definitiva + consulta_2
+
+     # borrar el UNION q queda al final
+     # eliminar los ultimos caracteres de un string
+     # https://stackoverflow.com/questions/1798465/python-remove-last-3-characters-of-a-string
+     consulta_2_definitiva = consulta_2_definitiva[:-6]
+
+     # ejecutar consulta_2_definitiva

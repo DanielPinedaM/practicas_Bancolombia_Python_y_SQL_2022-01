@@ -1,0 +1,4 @@
+# Codigo de Python para subir DataFrame a LZ
+
+sp=Sparky('danpined',"IMPALA_PROD")
+sp.subir_df(data_informe,"proceso_riesgos.informe_recu_202201")

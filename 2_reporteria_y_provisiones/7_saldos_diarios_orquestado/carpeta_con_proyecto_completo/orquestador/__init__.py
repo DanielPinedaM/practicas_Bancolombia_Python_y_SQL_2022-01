@@ -1,0 +1,1 @@
+from orquestador.impala_manager import ImpalaExecutionManager

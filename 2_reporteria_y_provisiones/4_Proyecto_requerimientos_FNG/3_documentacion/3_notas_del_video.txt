@@ -1,0 +1,154 @@
+EXPLICACION PASO A PASO AUTOMATIZACION PROYECTO FNG:
+
+1) Descomprimir proyecto
+
+2) Estructura del proyecto 
+
+3) Explicar para q sirve el codigo
+
+4) Características del código:
+- El código funciona sin importar en que carpeta
+  este el proyecto descomprimido.
+
+- El numero_identificacion y numero_obligacion 
+  se buscan en la carpeta insumos sin importar en que columnas estén.
+
+- Funciona para insumos con cualquier numero de filas.
+
+- Funciona para cualquier numero de archivos de insumos.
+
+- Ejecuta automáticamente las consultas en LZ 
+  y para cada Excel de insumo se crea un Excel de respuesta. 
+  Ejemplo: Para insumo_1.xlsx se crea respuesta_1.xlsx 
+  y así sucesivamente hasta terminar con todos los insumos
+
+- El Excel de respuesta tiene el mismo nombre que el de insumo, 
+  pero con la fecha y hora, en el siguiente formato:
+  año-mes-dia_hora-minutos-segundos-milisegundos_NombreInsumo
+
+5) Estandarizar formato de insumos, el codigo falla cuando no haces esto:
+- LO MEJOR es q las columnas se tienen q llamar 
+  numero_identificacion y numero_obligacion
+  (sin tildes ni mayúsculas ni espacios)
+
+- Tambien pueden tener estos otros nombres, 
+   pero NO se confie, es mejor q cambie los nombres para q no falle el codigo
+   Número de identificación
+   Numero de identificacion
+   numero de identificacion
+   número identificación
+   NUMERO DE IDENTIFICACION
+   NÚMERO IDENTIFICACIÓN
+   nit
+   Nit
+   NIT
+
+   numero_obligacion
+   Número de obligación
+   Numero de obligacion
+   número de obligación	
+   numero obligacion
+   NUMERO DE OBLIGACION
+   NÚMERO OBLIGACIÓN
+
+- En estas columnas SOLAMENTE puede haber casillas con numeros
+  NO se puede escribir #N/D ni otra cosa diferente
+  Los numeros NO pueden tener espacios
+
+- Cuando en las columnas numero_identificacion y numero_obligacion
+  el dato no existe entonces la casilla se tiene que dejar vacía
+
+- Las hojas de Excel de insumos se tienen q llamar Base
+
+- La extensión de los archivos de Excel de insumos tiene que ser .xlsx
+
+6) Cambiar las 3_macro_variables.xlsx
+Estos son los nombres de las tablas
+
+*** tablas de las CONSULTAS 1, 2 y 3 ***
+
+TABLA PRE-LIMINAR
+proceso_riesgos.ceniegarc_preliminar
+resultados_riesgos.ceniegarc_preliminar
+
+TABLA DEFINITIVA
+resultados_riesgos.ceniegarc_lz
+
+ERROR (LA TABLA NO EXISTE)
+proceso_riesgos.ceniegarc_lz
+
+*** tablas de la CONSULTA 4 ***
+resultados_preaprobados.buro_pj_detallado_principal
+resultados_preaprobados.buro_pn_detallado_principal
+resultados_preaprobados.buro_indep_sineeff_detallado_principal
+
+7) ANTES de ejecutar el codigo
+- Iniciar sesion en el VPN de Bancolombia (Citrix Secure Access)
+  https://vpn.bancolombia.com/vpns/portal/homepage2.html
+
+- Instalar las siguientes librerías de Python ejecutando los siguientes comandos en CMD:
+  pip install --upgrade --user pip
+  pip install openpyxl --user
+  pip install pandas --user
+  pip install pyodbc --user
+  python -m pip install sparky-bc -i https://artifactory.apps.bancolombia.com/api/pypi/pypi-bancolombia/simple --trusted-host artifactory.apps.bancolombia.com --user
+  python -m pip install Pysftp -i https://artifactory.apps.bancolombia.com/api/pypi/pypi-bancolombia/simple --trusted-host artifactory.apps.bancolombia.com --user
+
+- Meter dentro de la carpeta ...\2_excel\1_insumo los Excel
+  a los q le quiero agregar las nuevas columnas
+
+- Cerrar todos los Excel de insumos
+
+- Cerrar el Excel 3_macro_variables.xlsx 
+
+- NO cambiar los nombres de las carpetas NI archivos del proyecto
+
+- Los Excel que están dentro de la carpeta “1_insumo” 
+  pueden tener cualquier nombre, pero con un máximo de 32 caracteres:
+
+- Siempre usar Spyder para ejecutar
+
+- NO cerrar el programa (Spyder) hasta q se termine de ejecutar, 
+  hasta q diga
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  █┌─┐┌─┐┌┬┐┌─┐┬  ┌─┐┌┬┐┌─┐┌┬┐┌─┐█
+  █│  │ ││││├─┘│  ├┤  │ ├─┤ │││ │█
+  █└─┘└─┘┴ ┴┴  ┴─┘└─┘ ┴ ┴ ┴─┴┘└─┘█
+  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+
+- El codigo se demora dependiendo de la "velocidad de LZ"
+
+- Los Excel que están dentro de la carpeta “1_insumo” 
+  pueden tener cualquier nombre, pero con un máximo de 32 caracteres
+
+- Cuando se crean las nuevas columnas las casillas (celdas) vacias 
+  significan q NO existen datos 
+  (esto NO significa q el codigo este malo falló)
+
+- En caso de que el código falle vuélvalo a ejecutar otra vez 
+
+8) Ejecutar el codigo:
+- Abrir Spyder
+
+- Abrir el codigo de Python automatizacion_FNG.py
+
+- Dentro de Spyder click a la carpeta q esta en la parte superior derecha
+
+- Abrir carpeta ...\1_codigo_fuente
+
+- Click en seleccionar carpeta 
+
+9) Los Excel con las columnas nuevas añadidas 
+   se crean en la carpeta ...\2_excel\2_respuesta
+
+10) Las primeras columnas tienen el siguiente orden
+1. numero_identificacion
+2. numero_obligacion
+3. consulta 1 - max_altmora_a_corte_de_febrero_20_del_cliente_interna
+4. consulta 2 - calificacion_al_momento_del_desembolso
+5. consulta 3 - max_calificacion_del_cliente_a_corte_de_junio_20
+6. consulta 4 - max_altamora_a_corte_de_febrero_20_del_cliente_externa
+7. Despues estan el resto de las columnas
+
+11) Explicar codigo:
+    Primero el de SQL y despues el de Python

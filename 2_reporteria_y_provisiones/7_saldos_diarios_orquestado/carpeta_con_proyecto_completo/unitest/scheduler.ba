@@ -1,0 +1,48 @@
+@echo off
+::https://www.windowscentral.com/how-create-task-using-task-scheduler-command-prompt
+
+setlocal
+
+set TASK_NAME="Production Test Central Externa"
+set TASK_FILE="%~dp0test_and_mail.bat"
+set TASK_HOUR="05:00"
+set TASK_PERIODICITY="DAILY"
+::set TASK_PERIODICITY="MINUTE"
+::set TASK_SPAN=5
+
+if NOT exist %TASK_FILE% (
+  ECHO No se puede crear la tarea porque el archivo a ejecutar Archivo %TASK_FILE% no existe
+  pause
+  goto :END
+)
+
+:choice
+set /P c="Esta seguro que quiere crear la tarea programada con nombre %TASK_NAME% y con periodicidad %TASK_PERIODICITY% a las %TASK_HOUR% para ejecutar el archivo %TASK_FILE%.(Y/[N])?"
+if /I "%c%" EQU "Y" goto :CREATE_TASK
+if /I "%c%" EQU "N" goto :END
+goto :choice
+
+
+:CREATE_TASK
+SCHTASKS /CREATE /SC %TASK_PERIODICITY% /ST %TASK_HOUR% /TN %TASK_NAME% /TR %TASK_FILE%
+
+IF %ERRORLEVEL% EQU 0 GOTO OK
+IF %ERRORLEVEL% GTR 0 GOTO ERROR
+
+:ERROR
+COLOR C
+echo.
+@echo Se detecta error en la matricula.
+pause
+
+goto END
+
+:OK
+COLOR A
+echo.
+@echo Proceso realizado exitosamente.
+pause
+
+:END
+endlocal
+exit

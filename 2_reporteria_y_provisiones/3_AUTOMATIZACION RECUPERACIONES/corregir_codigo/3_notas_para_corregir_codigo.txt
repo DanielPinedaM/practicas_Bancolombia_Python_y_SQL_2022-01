@@ -1,0 +1,48 @@
+*** VERIFICAR CONDICIONALES DEL PUNTO 1
+
+*** en el codigo SQL cambiar todos los nombres de las bases de datos a proceso_consumidores
+*** y desps de hacer esto volver a ejecutar todas las consultas SQL
+
+*** ES MUY PROBABLE q el error sea del .py de él y NO de mi .sql
+
+*** El error es este: No se estan llenando (reemplazando) las casillas vacias o NULL
+
+*** Mandar condicionales a Gian y preguntarle ¿falta algun condicional? - todos estan completos
+
+En el Excel q me paso Gian en las casillas q estan vacias 
+verifiq si se cumplen o no los condicionales,
+pantallazo de esto para mostrarle a Gian
+
+*** Seleccionar las columnas en mayuscula UPPER() o minuscula segun sea necesario,
+*** verifiq q esto funcione
+*** clasificacion_de_cartera
+*** base
+
+*** abrir y cerrar parentesis asi: 
+
+*** (CASE...
+***      ELSE modalidad
+*** END) AS modalidad
+
+*** En la columna llamada base filtrar datos por hipotecario 
+*** para q se pueda ver el error (del renglon anterior)
+
+*** googlear esto: stackoverflow.com select empty and null in sql
+
+*** es probable q el error este en los IN (...)
+*** para ello reemplazar los IN (...) por OR 
+*** tambien castea modalidad a tipo string, 
+*** verifiq q este codigo no tenga error de sintaxis. Asi:
+
+*** ... AND ((TRIM(CAST(modalidad AS STRING))="")
+***          OR (modalidad IS NULL)
+***          OR (TRIM(CAST(modalidad AS STRING))="NULL")
+***        ) /* AND (TRIM(modalidad) IN("",NULL, "NULL")) */
+
+*** VERIFICAR TODOS LOS CONDICIONALES
+
+*** esta puede ser otra causa del error:
+*** no se su usar comillas simples '...' ó comillas dobles "..."
+
+*** Cuando termines guardar tabla en Excel en
+*** ...\3_AUTOMATIZACION RECUPERACIONES\1_BackupBasesDeDatos\4.2_Punto_1_terminado_2022-05.csv

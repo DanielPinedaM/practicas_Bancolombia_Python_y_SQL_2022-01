@@ -1,0 +1,41 @@
+DROP TABLE IF EXISTS  proceso.cd_cecsif2_pymes_sms  PURGE;
+CREATE TABLE proceso.cd_cecsif2_pymes_sms  STORED AS PARQUET AS
+
+WITH
+
+CECSIF1 AS (
+SELECT *
+FROM  proceso.cd_cecsif1_pymes_sms 
+),
+
+COMPORTAMIENTO AS (
+SELECT corte AS f_proceso, fdesem, vdesem, tid, id, obl341, apl, pl, md3411, altmora, sk, cv1
+FROM resultados_riesgos.ceniegarc_lz 
+WHERE year in (2017,2018,2019,2020,2021) AND 
+      from_timestamp(fdesem, 'yyyyMM') >= '201701' AND 
+      corte >= 201702 AND 
+      vdesem > 0 AND 
+      vdesem IS NOT NULL AND
+      apl NOT IN ('C','D') AND 
+      pl NOT IN ('A43','A13','A53','A50','A42','A41','A11',	'A15','A14','A12','A52',	'A47','A16','A45','A21',	'A51','A56','A55','A17','A10','A20','A40') 
+
+),
+
+PREVIA AS (
+SELECT x.*, v.f_proceso, v.altmora, v.sk, v.cv1
+FROM cecsif1 x
+LEFT JOIN comportamiento v ON CAST(x.obl341 AS BIGINT)=CAST(v.obl341 AS BIGINT) AND 
+                              CAST(x.MD3411 AS BIGINT)=CAST(v.MD3411 AS BIGINT) AND 
+                              x.apl=v.apl AND 
+                              x.vdesem=v.vdesem 
+)
+
+ 
+SELECT *
+FROM previa
+
+;
+
+COMPUTE STATS proceso.cd_cecsif2_pymes_sms
+
+;

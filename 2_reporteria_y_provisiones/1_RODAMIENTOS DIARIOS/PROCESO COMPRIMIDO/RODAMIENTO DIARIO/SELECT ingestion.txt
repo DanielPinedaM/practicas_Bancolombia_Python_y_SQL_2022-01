@@ -1,0 +1,33 @@
+-- AQUI ESTAN LOS NUEVOS REGISTROS Q TENGO Q ACTUALIZAR
+
+SELECT ingestion_year,
+       ingestion_month,
+       ingestion_day,
+       COUNT(*)
+FROM resultados_riesgos.reporte_saldos_diarios /*NombreBD.NombreTabla*/
+GROUP BY 1, 2, 3
+/* DESC es de mayor a menor */
+ORDER BY 1 DESC, 2 DESC, 3 DESC;
+
+/* ################################################ */
+
+-- LA ULTIMA FECHA DE INGESTION ES LA Q ESTA MAS ARRIBA
+
+SELECT ingestion_year AS ultimo_anio_de_ingestion,
+       ingestion_month AS ultimo_mes_de_ingestion,
+       ingestion_day AS ultimo_dia_de_ingestion,
+       COUNT(*)
+FROM resultados_riesgos.matriz_rodamientos_capa_final_diaria /*ESTE ES ${year_ayer} ${month_ayer} ${day_ayer} */
+GROUP BY 1, 2, 3
+ORDER BY 1 DESC, 2 DESC, 3 DESC /* DESC es de mayor a menor */
+LIMIT 1; /* seleccionar una sola fila (registro) */
+
+/* ################################################ */
+
+-- CONTAR EL NUMERO DE REGISTROS DE LAS FECHAS DE CORTE - en las comillas "" va la fecha de corte
+
+SELECT COUNT(*) FROM proceso_consumidores.rodamientos_diarios_20220215
+
+/* ################################################ */
+
+DROP TABLE NombreTable PURGE;

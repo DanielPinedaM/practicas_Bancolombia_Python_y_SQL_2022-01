@@ -1,0 +1,53 @@
+DROP TABLE IF EXISTS  proceso.cd_cecsif2_pymes  PURGE
+
+;
+
+CREATE TABLE proceso.cd_cecsif2_pymes  STORED AS PARQUET AS
+
+WITH
+
+CECSIF1 AS (
+SELECT *
+FROM  proceso.cd_cecsif1_pymes 
+),
+
+COMPORTAMIENTO AS (
+SELECT 
+CAST(from_timestamp(f_desemb, 'yyyyMM') AS BIGINT) AS f_proceso
+,f_desemb as fdesem 
+,vlr_desemb_oblig as vdesem
+,tipo_identificacion_cli as tid 
+,num_doc as  id 
+,oblig as obl341 
+,cod_apli as apl 
+,cod_plan as  pl
+,cod_moneda as md3411  
+,dias_mora as altmora 
+,sld_cap_tot as sk 
+,cv as cv1
+FROM resultados_riesgos.master_credit_risk
+WHERE (ingestion_year BETWEEN 2018 and year(now())) AND 
+      from_timestamp(f_desemb, 'yyyyMM') >= '201701' AND 
+      CAST(from_timestamp(f_desemb, 'yyyyMM') AS BIGINT) >= 201702 AND 
+      --vlr_desemb_oblig  > 0 AND 
+      vlr_desemb_oblig  IS NOT NULL AND
+      trim(cod_apli) NOT IN ('C','D') AND 
+      trim(cod_plan) NOT IN ('A43','A13','A53','A50','A42','A41','A11',	'A15','A14','A12','A52',	'A47','A16','A45','A21',	'A51','A56','A55','A17','A10','A20','A40') 
+),
+
+PREVIA AS (
+SELECT x.*, v.f_proceso, v.altmora, v.sk, v.cv1
+FROM cecsif1 x
+LEFT JOIN comportamiento v ON CAST(x.obl341 AS BIGINT)=CAST(v.obl341 AS BIGINT) AND 
+                              CAST(x.MD3411 AS BIGINT)=CAST(v.MD3411 AS BIGINT) AND 
+                              x.apl=v.apl AND 
+                              x.vdesem=v.vdesem 
+)
+
+SELECT *
+FROM previa
+;
+
+COMPUTE STATS proceso.cd_cecsif2_pymes
+
+;
